@@ -1,17 +1,19 @@
-
 import { createRouter, createWebHistory } from 'vue-router';
-import Signup from '@/components/Signup.vue';  
+import Home from '@/components/Home.vue'; 
+import Signup from '@/components/Signup.vue';
 import Login from '@/components/Login.vue';
-import App from '@/App.vue';
+import Chat from '@/components/Chat.vue'
 
 const routes = [
-  { path: '/', component: App },
-  { path: '/signup', component: Signup },
-  { path: '/login', component: Login },
+  { path: '/', name: 'Home', component: Home }, 
+  { path: '/signup', name: 'Signup', component: Signup },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/chat', name: 'Chat', component: Chat},
+  { path: '/chat/:username', component: Chat },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),  
+  history: createWebHistory(),
   routes,
 });
 
