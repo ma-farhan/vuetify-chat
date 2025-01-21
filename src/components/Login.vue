@@ -1,3 +1,34 @@
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { VBtn, VContainer, VCard, VCardText, VCardTitle, VCardActions, VTextField, VForm } from 'vuetify/lib/components/index.mjs';
+
+const email = ref('');
+const password = ref('');
+const isValid = ref(false);
+const router = useRouter();
+
+const rules = {
+  required: (value) => !!value || 'Field is required',
+  email: (value) => /.+@.+\..+/.test(value) || 'Invalid email address',
+};
+
+const submitLogin = () => {
+  if (isValid.value) {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find((u) => u.email === email.value && u.password === password.value);
+
+    if (user) {
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      alert('Login successful!');
+      router.push(`/chat/${user.username}`); 
+    } else {
+      alert('Invalid credentials');
+    }
+  }
+};
+</script>
+
 <template>
   <v-container class="d-flex justify-center align-center fill-height">
     <v-card class="pa-5 w-100">
@@ -5,17 +36,16 @@
       <v-card-text>
         <v-form ref="loginForm" v-model="isValid" lazy-validation>
           <v-text-field
-            label="Email"
             v-model="email"
+            label="Email"
             :rules="[rules.required, rules.email]"
             required
           ></v-text-field>
-
           <v-text-field
-            label="Password"
             v-model="password"
-            :rules="[rules.required, rules.password]"
+            label="Password"
             type="password"
+            :rules="[rules.required]"
             required
           ></v-text-field>
         </v-form>
@@ -26,35 +56,3 @@
     </v-card>
   </v-container>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { VContainer,VCard,VCardTitle,VCardActions,VBtn,VCardText,VTextField,VForm } from 'vuetify/lib/components/index.mjs';
-
-const email = ref('');
-const password = ref('');
-const isValid = ref(false);
-const router = useRouter();
-
-const rules = {
-  required: (value) => !!value || 'Field is required',
-  email: (value) => /.+@.+\..+/.test(value) || 'Invalid email address',
-  password: (value) =>
-    value?.length >= 6 || 'Password must be at least 6 characters long',
-};
-
-const submitLogin = () => {
-  if (isValid.value) {
-    const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
-
-    if (storedUser && storedUser.email === email.value && storedUser.password === password.value) {
-      alert('Login successful!');
-      router.push(`/chat/${storedUser.username}`); // Redirect to chat
-    } else {
-      alert('Invalid credentials');
-    }
-  }
-};
-</script>
-
