@@ -21,8 +21,15 @@ const getChatKey = (user1, user2) => {
   return `${users[0]}_${users[1]}`;
 };
 
+const chatBox = ref([])
+const getData = () => {
+  chatBox.value = messages.value[getChatKey(loggedInUser.value.username, currentUser.value.username)]
+
+}
+
 const switchUser = (user) => {
   currentUser.value = user;
+  getData()
 };
 
 const clearMessages = () => {
@@ -34,9 +41,10 @@ const clearMessages = () => {
       clearedChats.value[loggedInUser.value.username] = [];
     }
 
-    if (!clearedChats.value[loggedInUser.value.username].includes(chatKey)) {
-      clearedChats.value[loggedInUser.value.username].push(chatKey);
-    }
+    console.log('werwer', messages.value[chatKey]);
+    // if (!clearedChats.value[loggedInUser.value.username].includes(chatKey)) {
+    clearedChats.value[loggedInUser.value.username] = messages.value[chatKey].length;
+    // }
 
 
     localStorage.setItem('clearedChats', JSON.stringify(clearedChats.value));
@@ -67,21 +75,21 @@ const sendMessage = () => {
     });
 
 
-    if (clearedChats.value[loggedInUser.value.username]) {
-      clearedChats.value[loggedInUser.value.username] = clearedChats.value[
-        loggedInUser.value.username
-      ].filter((key) => key !== chatKey);
-    }
+    // if (clearedChats.value[loggedInUser.value.username]) {
+    //   clearedChats.value[loggedInUser.value.username] = clearedChats.value[
+    //     loggedInUser.value.username
+    //   ].filter((key) => key !== chatKey);
+    // }
 
 
     localStorage.setItem('messages', JSON.stringify(messages.value));
-    localStorage.setItem('clearedChats', JSON.stringify(clearedChats.value));
+    // localStorage.setItem('clearedChats', JSON.stringify(clearedChats.value));
 
     message.value = '';
-    nextTick(() => {
-      const container = document.querySelector('[ref="messageContainer"]');
-      container.scrollTop = container.scrollHeight;
-    });
+    // nextTick(() => {
+    //   const container = document.querySelector('[ref="messageContainer"]');
+    //   container.scrollTop = container.scrollHeight;
+    // });
   } else {
     alert('Please enter a message!');
   }
@@ -130,12 +138,7 @@ onMounted(() => {
     <v-divider></v-divider>
     <v-card-text ref="messageContainer" class="flex-grow-1 pa-4">
       <div v-if="currentUser">
-        <div v-for="msg in messages[getChatKey(loggedInUser.username, currentUser.username)]?.filter(
-          () =>
-            !(clearedChats[loggedInUser.username]?.includes(
-              getChatKey(loggedInUser.username, currentUser.username)
-            ))
-        ) || []" :key="msg.timestamp" :class="{
+        <div v-for="msg in chatBox.slice(clearedChats[loggedInUser.username]) || []" :key="msg.timestamp" :class="{
           'd-flex flex-column align-end my-2': msg.from === loggedInUser.username,
           'd-flex flex-column align-start my-2': msg.from !== loggedInUser.username,
         }">
